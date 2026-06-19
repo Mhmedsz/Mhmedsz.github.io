@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mohamed Ahmed Zaky — Junior .NET Developer</title>
+  <meta name="description" content="Portfolio of Mohamed Ahmed Zaky, a Junior .NET / C# Backend Developer specializing in ASP.NET Core, SQL Server, and Entity Framework Core." />
+  <meta name="author" content="Mohamed Ahmed Zaky" />
+
+  <!-- Google Fonts: Space Grotesk (display), Inter (body), JetBrains Mono (code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- ═══════════════════════════════════════════════
+       STYLES
+       ═══════════════════════════════════════════════ -->
+  <style>
+    /* ─────────────────────────────
+       COLOR PALETTE  —  ".NET Compiled"
+       ─────────────────────────────
+       --bg-deep      #0D0D12   near-black (IDE background)
+       --bg-surface   #16161E   elevated surface / cards
+       --dotnet       #512BD4   .NET purple  (primary accent)
+       --csharp-blue  #6A40D4   C# blue-purple (secondary)
+       --accent-cyan  #4EC9B0   terminal green/cyan  (highlights)
+       --text-primary #E8E6F0   light lavender white
+       --text-muted   #8C899A   muted slate
+       --border       #2A2A3A   subtle border
+    */
+    :root {
+      --bg-deep: #0D0D12;
+      --bg-surface: #16161E;
+      --dotnet: #512BD4;
+      --csharp-blue: #6A40D4;
+      --accent-cyan: #4EC9B0;
+      --text-primary: #E8E6F0;
+      --text-muted: #8C899A;
+      --border: #2A2A3A;
+
+      /* Fonts */
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── RESET & BASE ───────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── ACCESSIBILITY: FOCUS RING ──── */
+    :focus-visible {
+      outline: 2px solid var(--accent-cyan);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    /* ─── prefers-reduced-motion ─────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ─── SCROLLBAR ──────────────────── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar-thumb { background: var(--dotnet); border-radius: 4px; }
+
+    /* ─── LAYOUT ─────────────────────── */
+    .container {
+      width: min(1100px, 90%);
+      margin-inline: auto;
+    }
+
+    section {
+      padding: 100px 0;
+    }
+
+    /* ─── AMBIENT CONSTELLATION CANVAS ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════
+       COMPILE LOADER  (signature moment)
+       ═══════════════════════════════════ */
+    #compile-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg-deep);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #compile-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-terminal {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      text-align: left;
+      width: min(420px, 85%);
+    }
+    .loader-terminal .line {
+      opacity: 0;
+      transform: translateY(6px);
+      animation: loaderLine 0.3s ease forwards;
+    }
+    .loader-terminal .line.prompt::before {
+      content: '> ';
+      color: var(--dotnet);
+    }
+    .loader-bar {
+      width: min(420px, 85%);
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loader-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--dotnet), var(--accent-cyan));
+      border-radius: 2px;
+      animation: loadFill 2s ease-in-out forwards;
+    }
+
+    @keyframes loaderLine {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes loadFill {
+      0% { width: 0%; }
+      30% { width: 35%; }
+      60% { width: 70%; }
+      90% { width: 95%; }
+      100% { width: 100%; }
+    }
+
+    /* ═══════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════ */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(13, 13, 18, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      transition: transform 0.3s ease;
+    }
+    .navbar.nav-hidden {
+      transform: translateY(-100%);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--accent-cyan);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo .dot { color: var(--dotnet); }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 28px;
+    }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      text-transform: lowercase;
+      letter-spacing: 0.5px;
+      transition: color 0.25s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--dotnet);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text-primary);
+    }
+    .nav-links a:hover::after,
+    .nav-links a:focus-visible::after {
+      width: 100%;
+    }
+
+    /* Mobile hamburger */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .nav-toggle { display: block; }
+      .nav-links {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: rgba(13, 13, 18, 0.97);
+        backdrop-filter: blur(16px);
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links.open {
+        max-height: 380px;
+      }
+      .nav-links li {
+        width: 100%;
+        text-align: center;
+      }
+      .nav-links a {
+        display: block;
+        padding: 16px;
+        font-size: 0.9rem;
+      }
+      .nav-links a::after { display: none; }
+    }
+
+    /* ═══════════════════════════════════
+       SECTION REVEAL (scroll animation)
+       ═══════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ═══════════════════════════════════
+       SECTION HEADER
+       ═══════════════════════════════════ */
+    .section-header {
+      margin-bottom: 48px;
+    }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-header h2 .line-num {
+      font-family: var(--font-mono);
+      font-size: 0.75em;
+      color: var(--dotnet);
+      opacity: 0.7;
+    }
+    .section-header h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+      margin-left: 16px;
+    }
+
+    /* ═══════════════════════════════════
+       1. HERO
+       ═══════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      padding-top: 80px;
+    }
+    .hero-content {
+      max-width: 720px;
+    }
+    .hero-greeting {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--accent-cyan);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-greeting .caret {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--accent-cyan);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--csharp-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-title {
+      font-family: var(--font-mono);
+      font-size: clamp(0.72rem, 1.5vw, 0.88rem);
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      line-height: 1.8;
+      max-width: 600px;
+    }
+    .hero-title .keyword { color: var(--dotnet); }
+    .hero-title .type    { color: var(--accent-cyan); }
+    .hero-title .string  { color: #CE9178; }
+
+    /* typed text container */
+    .typed-line {
+      min-height: 1.8em;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .typed-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1.1em;
+      background: var(--accent-cyan);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .hero-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .hero-links .btn-primary {
+      background: var(--dotnet);
+      color: #fff;
+      border: 1px solid var(--dotnet);
+    }
+    .hero-links .btn-primary:hover {
+      background: transparent;
+      color: var(--dotnet);
+      box-shadow: 0 0 20px rgba(81, 43, 212, 0.3);
+    }
+    .hero-links .btn-ghost {
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .hero-links .btn-ghost:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(78, 201, 176, 0.15);
+    }
+
+    /* ═══════════════════════════════════
+       2. ABOUT
+       ═══════════════════════════════════ */
+    .about-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--dotnet), var(--accent-cyan));
+    }
+    .about-card p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.9;
+      max-width: 720px;
+    }
+    .about-card .highlight {
+      color: var(--accent-cyan);
+      font-weight: 500;
+    }
+    .about-comment {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #6A993E;
+      margin-bottom: 16px;
+    }
+
+    /* ═══════════════════════════════════
+       3. SKILLS
+       ═══════════════════════════════════ */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .skill-category {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .skill-category:hover {
+      border-color: var(--dotnet);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(81, 43, 212, 0.15);
+    }
+    .skill-category h3 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .skill-category h3 i {
+      font-size: 1rem;
+      color: var(--dotnet);
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .skill-tag {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: rgba(81, 43, 212, 0.1);
+      border: 1px solid rgba(81, 43, 212, 0.25);
+      color: var(--text-primary);
+      transition: all 0.25s ease;
+      cursor: default;
+    }
+    .skill-tag:hover {
+      background: rgba(81, 43, 212, 0.25);
+      border-color: var(--dotnet);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(81, 43, 212, 0.2);
+    }
+
+    /* ═══════════════════════════════════
+       4. EXPERIENCE
+       ═══════════════════════════════════ */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--dotnet), var(--accent-cyan), transparent);
+    }
+    .timeline-item {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -38px;
+      top: 36px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--dotnet);
+      border: 3px solid var(--bg-deep);
+      box-shadow: 0 0 12px rgba(81, 43, 212, 0.5);
+    }
+    .timeline-role {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .timeline-company {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--dotnet);
+      margin-bottom: 4px;
+    }
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .timeline-date .badge {
+      background: rgba(81, 43, 212, 0.15);
+      border: 1px solid rgba(81, 43, 212, 0.3);
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      color: var(--accent-cyan);
+    }
+    .timeline-bullets {
+      list-style: none;
+    }
+    .timeline-bullets li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .timeline-bullets li::before {
+      content: '//';
+      position: absolute;
+      left: 0;
+      color: var(--dotnet);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════
+       5. EDUCATION
+       ═══════════════════════════════════ */
+    .edu-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px;
+    }
+    .edu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .edu-school {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .edu-degree {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .edu-gpa {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 6px 16px;
+      background: rgba(78, 201, 176, 0.1);
+      border: 1px solid rgba(78, 201, 176, 0.3);
+      border-radius: 20px;
+      color: var(--accent-cyan);
+    }
+    .edu-date {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .grad-project {
+      margin-top: 20px;
+      padding: 24px;
+      background: rgba(81, 43, 212, 0.06);
+      border: 1px solid rgba(81, 43, 212, 0.2);
+      border-radius: 12px;
+    }
+    .grad-project-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .grad-project-grade {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent-cyan);
+      margin-bottom: 12px;
+    }
+    .grad-project-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    /* Stat cards */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .stat-card:hover {
+      border-color: var(--dotnet);
+      transform: translateY(-3px);
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--dotnet), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ═══════════════════════════════════
+       6. CERTIFICATIONS & LANGUAGES
+       ═══════════════════════════════════ */
+    .cert-lang-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .cl-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+    }
+    .cl-card h3 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cl-card h3 i {
+      color: var(--dotnet);
+    }
+    .cl-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cl-item:last-child { border-bottom: none; }
+    .cl-item i {
+      color: var(--dotnet);
+      margin-top: 4px;
+      font-size: 0.85rem;
+    }
+    .cl-item-title {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+    .cl-item-sub {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .lang-level {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+    .lang-level.native {
+      background: rgba(78, 201, 176, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(78, 201, 176, 0.3);
+    }
+    .lang-level.intermediate {
+      background: rgba(81, 43, 212, 0.15);
+      color: var(--dotnet);
+      border: 1px solid rgba(81, 43, 212, 0.3);
+    }
+
+    /* ═══════════════════════════════════
+       7. CONTACT / FOOTER
+       ═══════════════════════════════════ */
+    .contact-section {
+      text-align: center;
+    }
+    .contact-section .section-header h2::after {
+      display: none;
+    }
+    .contact-section .section-header h2 {
+      justify-content: center;
+    }
+    .contact-text {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      max-width: 500px;
+      margin-inline: auto;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .contact-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .contact-links a:hover {
+      border-color: var(--dotnet);
+      color: var(--text-primary);
+      box-shadow: 0 4px 16px rgba(81, 43, 212, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, var(--dotnet), var(--csharp-blue));
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      margin-top: 8px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(81, 43, 212, 0.4);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .footer-copy .dotnet-tag { color: var(--dotnet); }
+
+    /* ═══════════════════════════════════
+       RESPONSIVE TWEAKS
+       ═══════════════════════════════════ */
+    @media (max-width: 600px) {
+      section { padding: 60px 0; }
+      .about-card { padding: 24px; }
+      .timeline { padding-left: 24px; }
+      .timeline-item { padding: 20px; }
+      .timeline-item::before { left: -30px; top: 24px; width: 10px; height: 10px; }
+      .edu-card { padding: 24px; }
+      .grad-project { padding: 16px; }
+      .stat-cards { grid-template-columns: 1fr; }
+      .hero-links { flex-direction: column; }
+      .hero-links a { justify-content: center; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════
+       COMPILE LOADER  –  signature load animation
+       ══════════════════════════════════════════ -->
+  <div id="compile-loader" aria-hidden="true">
+    <div class="loader-terminal" id="loader-lines"></div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       AMBIENT CONSTELLATION CANVAS
+       ══════════════════════════════════════════ -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- ══════════════════════════════════════════
+       NAVIGATION
+       ══════════════════════════════════════════ -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo" aria-label="Home"><span class="dot">Mohamed</span> Zaky</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <ul class="nav-links" id="nav-links" role="list">
+        <li><a href="#about">about()</a></li>
+        <li><a href="#skills">skills[]</a></li>
+        <li><a href="#experience">experience{}</a></li>
+        <li><a href="#education">education</a></li>
+        <li><a href="#certifications">certs</a></li>
+        <li><a href="#contact">contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ════════════════════════════════════════
+         SECTION 1: HERO
+         ════════════════════════════════════════ -->
+    <section class="hero" id="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-greeting">
+            <span id="greeting-text"></span><span class="caret"></span>
+          </div>
+          <h1>Mohamed Ahmed Zaky</h1>
+          <div class="hero-title" aria-label="Junior .NET Developer, ASP.NET Core, C#, SQL Server, Entity Framework Core, Backend Developer">
+            <span class="keyword">public class</span> <span class="type">Developer</span> : <span class="type">IJuniorBackend</span><br/>
+            {<br/>
+            &nbsp;&nbsp;<span class="keyword">string[]</span> Stack =<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="string">"ASP.NET Core"</span>, <span class="string">"C#"</span>, <span class="string">"SQL Server"</span>,<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"EF Core"</span>, <span class="string">"Docker"</span> };<br/>
+            }
+          </div>
+          <div class="hero-links">
+            <a href="mailto:mohmedahmed557766@gmail.com" class="btn-primary" aria-label="Send email"><i class="fa-solid fa-envelope"></i> Email</a>
+            <a href="tel:+201008856747" class="btn-ghost" aria-label="Call phone"><i class="fa-solid fa-phone"></i> +20 1008856747</a>
+            <a href="https://linkedin.com/in/mohmed-ahmed-zaky" target="_blank" rel="noopener noreferrer" class="btn-ghost" aria-label="LinkedIn profile"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+            <a href="https://github.com/Mhmedsz" target="_blank" rel="noopener noreferrer" class="btn-ghost" aria-label="GitHub profile"><i class="fa-brands fa-github"></i> GitHub</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         SECTION 2: ABOUT
+         ════════════════════════════════════════ -->
+    <section id="about">
+      <div class="container reveal">
+        <div class="section-header">
+          <h2><span class="line-num">01</span> About</h2>
+        </div>
+        <div class="about-card">
+          <div class="about-comment">// who_am_i.cs</div>
+          <p>
+            Computer Science graduate passionate about backend development with
+            <span class="highlight">ASP.NET Core</span> and <span class="highlight">C#</span>.
+            Completed an intensive 6-month backend diploma at <span class="highlight">Route Academy</span>,
+            building RESTful APIs with design patterns (Repository, Specification, MVC),
+            Dependency Injection, and <span class="highlight">SOLID principles</span>.
+            Comfortable working with <span class="highlight">SQL Server</span>,
+            <span class="highlight">Entity Framework Core</span>, LINQ, JWT, and Docker.
+            Currently seeking a .NET internship/junior role to contribute to real-world projects
+            and keep growing as a developer.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         SECTION 3: SKILLS
+         ════════════════════════════════════════ -->
+    <section id="skills">
+      <div class="container reveal">
+        <div class="section-header">
+          <h2><span class="line-num">02</span> Skills</h2>
+        </div>
+        <div class="skills-grid">
+          <!-- Languages -->
+          <div class="skill-category">
+            <h3><i class="fa-solid fa-code"></i> Languages</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">C#</span>
+              <span class="skill-tag">C++</span>
+              <span class="skill-tag">Java</span>
+              <span class="skill-tag">SQL</span>
+            </div>
+          </div>
+          <!-- Backend Frameworks -->
+          <div class="skill-category">
+            <h3><i class="fa-solid fa-server"></i> Backend Frameworks</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">ASP.NET Core MVC</span>
+              <span class="skill-tag">ASP.NET Core Web APIs</span>
+            </div>
+          </div>
+          <!-- Databases -->
+          <div class="skill-category">
+            <h3><i class="fa-solid fa-database"></i> Databases</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">SQL Server</span>
+              <span class="skill-tag">MySQL</span>
+            </div>
+          </div>
+          <!-- Concepts & Practices -->
+          <div class="skill-category">
+            <h3><i class="fa-solid fa-cubes"></i> Concepts & Practices</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">RESTful APIs</span>
+              <span class="skill-tag">Repository Pattern</span>
+              <span class="skill-tag">Specification Pattern</span>
+              <span class="skill-tag">MVC Pattern</span>
+              <span class="skill-tag">SOLID Principles</span>
+              <span class="skill-tag">Dependency Injection</span>
+              <span class="skill-tag">OOP</span>
+              <span class="skill-tag">Data Structures</span>
+              <span class="skill-tag">Algorithms</span>
+            </div>
+          </div>
+          <!-- Tools -->
+          <div class="skill-category">
+            <h3><i class="fa-solid fa-wrench"></i> Tools</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">Git</span>
+              <span class="skill-tag">Docker</span>
+              <span class="skill-tag">Postman</span>
+              <span class="skill-tag">Swagger / OpenAPI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         SECTION 4: EXPERIENCE
+         ════════════════════════════════════════ -->
+    <section id="experience">
+      <div class="container reveal">
+        <div class="section-header">
+          <h2><span class="line-num">03</span> Experience</h2>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-role">Backend .NET Core Trainee</div>
+            <div class="timeline-company">Route IT Training Center</div>
+            <div class="timeline-date">
+              <i class="fa-regular fa-calendar"></i> Sep 2024 – Feb 2025
+              <span class="badge">6-Month Intensive</span>
+              <span class="badge">On-site</span>
+            </div>
+            <ul class="timeline-bullets">
+              <li>Completed an intensive 6-month hands-on program in backend development using ASP.NET Core and C#.</li>
+              <li>Built RESTful APIs applying Repository, Specification, and MVC design patterns, plus Dependency Injection and SOLID principles.</li>
+              <li>Core technologies used: C#, ASP.NET Core, SQL Server, Entity Framework Core, LINQ, JWT, Docker.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         SECTION 5: EDUCATION
+         ════════════════════════════════════════ -->
+    <section id="education">
+      <div class="container reveal">
+        <div class="section-header">
+          <h2><span class="line-num">04</span> Education</h2>
+        </div>
+        <div class="edu-card">
+          <div class="edu-header">
+            <div>
+              <div class="edu-school">Beni Suef University</div>
+              <div class="edu-degree">Bachelor's Degree, Computer Science</div>
+            </div>
+            <div class="edu-gpa">GPA: 3.09 / 4.0</div>
+          </div>
+          <div class="edu-date"><i class="fa-regular fa-calendar"></i> Sep 2020 – Jul 2024</div>
+
+          <div class="grad-project">
+            <div class="grad-project-title">
+              <i class="fa-solid fa-graduation-cap" style="color: var(--dotnet); margin-right: 6px;"></i>
+              Graduation Project: Smart Hajj App with Chatbot &amp; Crowd Prediction
+            </div>
+            <div class="grad-project-grade"><i class="fa-solid fa-star"></i> Grade: A+</div>
+            <div class="grad-project-desc">
+              Built with Flutter, Python, and TensorFlow. Developed a crowd prediction model and
+              integrated a real-time NLP chatbot for pilgrim assistance.
+            </div>
+
+            <div class="stat-cards">
+              <div class="stat-card">
+                <div class="stat-value">88%</div>
+                <div class="stat-label">Prediction Accuracy</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">25%</div>
+                <div class="stat-label">Congestion Reduction</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">90%</div>
+                <div class="stat-label">Queries Resolved</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         SECTION 6: CERTIFICATIONS & LANGUAGES
+         ════════════════════════════════════════ -->
+    <section id="certifications">
+      <div class="container reveal">
+        <div class="section-header">
+          <h2><span class="line-num">05</span> Certifications &amp; Languages</h2>
+        </div>
+        <div class="cert-lang-grid">
+          <!-- Certifications -->
+          <div class="cl-card">
+            <h3><i class="fa-solid fa-certificate"></i> Certifications</h3>
+            <div class="cl-item">
+              <i class="fa-solid fa-award"></i>
+              <div>
+                <div class="cl-item-title">Backend .NET Core Diploma</div>
+                <div class="cl-item-sub">Route IT Training Center · Sep 2024 – Feb 2025</div>
+              </div>
+            </div>
+          </div>
+          <!-- Languages -->
+          <div class="cl-card">
+            <h3><i class="fa-solid fa-language"></i> Languages</h3>
+            <div class="cl-item">
+              <i class="fa-solid fa-comment-dots"></i>
+              <div>
+                <div class="cl-item-title">Arabic <span class="lang-level native">Native</span></div>
+              </div>
+            </div>
+            <div class="cl-item">
+              <i class="fa-solid fa-comment-dots"></i>
+              <div>
+                <div class="cl-item-title">English <span class="lang-level intermediate">Intermediate</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         SECTION 7: CONTACT / FOOTER
+         ════════════════════════════════════════ -->
+    <section id="contact" class="contact-section">
+      <div class="container reveal">
+        <div class="section-header">
+          <h2><span class="line-num">06</span> Get In Touch</h2>
+        </div>
+        <p class="contact-text">
+          Interested in working together? Feel free to reach out — I'm always open to
+          new opportunities and collaborations.
+        </p>
+        <div class="contact-links">
+          <a href="mailto:mohmedahmed557766@gmail.com"><i class="fa-solid fa-envelope"></i> mohmedahmed557766@gmail.com</a>
+          <a href="tel:+201008856747"><i class="fa-solid fa-phone"></i> +20 1008856747</a>
+          <a href="https://linkedin.com/in/mohmed-ahmed-zaky" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+          <a href="https://github.com/Mhmedsz" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
+        </div>
+        <a href="Mohamed-Zaki.pdf" class="download-btn" download>
+          <i class="fa-solid fa-download"></i> Download CV
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container"></div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════
+       JAVASCRIPT
+       ═══════════════════════════════════════════════ -->
+  <script>
+    /* ─────────────────────────────────────────
+       1. COMPILE LOADER  –  signature moment
+       ───────────────────────────────────────── */
+    (function initLoader() {
+      const lines = [
+        { text: 'dotnet restore MohamedZaky.Portfolio', cls: 'prompt' },
+        { text: '  Restoring packages for Portfolio.csproj...' },
+        { text: '  All packages restored successfully.', delay: 400 },
+        { text: 'dotnet build --configuration Release', cls: 'prompt', delay: 200 },
+        { text: '  Build succeeded. 0 Warning(s). 0 Error(s).' },
+        { text: 'dotnet run', cls: 'prompt', delay: 200 },
+        { text: '  ✓ Portfolio is ready at localhost:5000', delay: 300 },
+      ];
+
+      const container = document.getElementById('loader-lines');
+      let cumulativeDelay = 0;
+
+      lines.forEach((l, i) => {
+        cumulativeDelay += (l.delay || 250);
+        const div = document.createElement('div');
+        div.className = 'line' + (l.cls ? ' ' + l.cls : '');
+        div.textContent = l.text;
+        div.style.animationDelay = cumulativeDelay + 'ms';
+        container.appendChild(div);
+      });
+
+      /* Hide loader after animation completes */
+      const totalTime = cumulativeDelay + 800;
+      setTimeout(() => {
+        document.getElementById('compile-loader').classList.add('hidden');
+      }, totalTime);
+    })();
+
+    /* ─────────────────────────────────────────
+       2. TYPING EFFECT for hero greeting
+       ───────────────────────────────────────── */
+    (function initTyping() {
+      const text = '> Hello World! I\'m Mohamed_';
+      const el = document.getElementById('greeting-text');
+      let i = 0;
+      /* Wait for loader to finish, then start typing */
+      setTimeout(() => {
+        const interval = setInterval(() => {
+          if (i < text.length) {
+            el.textContent += text.charAt(i);
+            i++;
+          } else {
+            clearInterval(interval);
+          }
+        }, 55);
+      }, 2800);
+    })();
+
+    /* ─────────────────────────────────────────
+       3. SCROLL-TRIGGERED REVEAL (IntersectionObserver)
+       ───────────────────────────────────────── */
+    (function initReveal() {
+      const reveals = document.querySelectorAll('.reveal');
+
+      /* Respect prefers-reduced-motion: reveal all immediately */
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        reveals.forEach(el => el.classList.add('visible'));
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+
+      reveals.forEach(el => observer.observe(el));
+    })();
+
+    /* ─────────────────────────────────────────
+       4. MOBILE NAV TOGGLE
+       ───────────────────────────────────────── */
+    (function initNav() {
+      const toggle = document.getElementById('nav-toggle');
+      const links = document.getElementById('nav-links');
+
+      toggle.addEventListener('click', () => {
+        const open = links.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open);
+        toggle.innerHTML = open
+          ? '<i class="fa-solid fa-xmark"></i>'
+          : '<i class="fa-solid fa-bars"></i>';
+      });
+
+      /* Close menu when a link is clicked */
+      links.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          links.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+        });
+      });
+    })();
+
+    /* ─────────────────────────────────────────
+       5. NAVBAR HIDE/SHOW ON SCROLL
+       ───────────────────────────────────────── */
+    (function initNavScroll() {
+      const navbar = document.querySelector('.navbar');
+      let lastY = 0;
+
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        if (y > lastY && y > 300) {
+          navbar.classList.add('nav-hidden');
+        } else {
+          navbar.classList.remove('nav-hidden');
+        }
+        lastY = y;
+      }, { passive: true });
+    })();
+
+    /* ─────────────────────────────────────────
+       6. CONSTELLATION NETWORK BACKGROUND
+       Floating nodes connected by lines when
+       close enough. Interactive — nodes gently
+       drift and pulse. Respects prefers-reduced-motion.
+       ───────────────────────────────────────── */
+    (function initConstellation() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      const nodes = [];
+      const NODE_COUNT = Math.min(80, Math.floor(window.innerWidth / 18));
+      const CONNECT_DIST = 160;
+      const MOUSE = { x: -9999, y: -9999 };
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', () => { resize(); });
+
+      /* Track mouse for interactive glow */
+      window.addEventListener('mousemove', (e) => {
+        MOUSE.x = e.clientX;
+        MOUSE.y = e.clientY;
+      }, { passive: true });
+
+      /* Create nodes */
+      for (let i = 0; i < NODE_COUNT; i++) {
+        nodes.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: Math.random() * 2 + 1,
+          pulse: Math.random() * Math.PI * 2,
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        /* Update & draw nodes */
+        for (let i = 0; i < nodes.length; i++) {
+          const n = nodes[i];
+          n.x += n.vx;
+          n.y += n.vy;
+          n.pulse += 0.015;
+
+          /* Wrap around edges */
+          if (n.x < -10) n.x = canvas.width + 10;
+          if (n.x > canvas.width + 10) n.x = -10;
+          if (n.y < -10) n.y = canvas.height + 10;
+          if (n.y > canvas.height + 10) n.y = -10;
+
+          /* Pulsing radius */
+          const pr = n.r + Math.sin(n.pulse) * 0.5;
+
+          /* Distance to mouse for brightness boost */
+          const dm = Math.hypot(n.x - MOUSE.x, n.y - MOUSE.y);
+          const mouseGlow = dm < 200 ? (1 - dm / 200) * 0.5 : 0;
+
+          const alpha = 0.15 + mouseGlow;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, pr, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(81, 43, 212, ${alpha})`;
+          ctx.fill();
+
+          /* Draw connections */
+          for (let j = i + 1; j < nodes.length; j++) {
+            const m = nodes[j];
+            const d = Math.hypot(n.x - m.x, n.y - m.y);
+            if (d < CONNECT_DIST) {
+              const lineAlpha = (1 - d / CONNECT_DIST) * 0.12;
+              ctx.beginPath();
+              ctx.moveTo(n.x, n.y);
+              ctx.lineTo(m.x, m.y);
+              ctx.strokeStyle = `rgba(78, 201, 176, ${lineAlpha})`;
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(draw);
+      }
+
+      requestAnimationFrame(draw);
+    })();
+  </script>
+</body>
+</html>
